@@ -19,17 +19,20 @@ import org.json.JSONObject;
 
 public class Hook {
     static final String TG = "https://t.me/darknes_lord";
-    static final String HTML = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InRyIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLCB2aWV3cG9ydC1maXQ9Y292ZXIiPgo8dGl0bGU+RG9tYWluIEF5YXJsYXLEsTwvdGl0bGU+CjxzdHlsZT4KICA6cm9vdHstLWJnOiMwZDE4MjA7LS1yYWlsOiMxNDIzMmQ7LS1maWVsZDojMGYxYzI1Oy0taW5rOiNlN2VmZjM7LS1tdXRlOiM4YWEwYWU7LS1saW5lOiMyNzQwNGY7LS1hY2NlbnQ6IzM4ZDNiODstLWFjY2VudC1pbms6IzA1MmEyNDstLXRnOiMyYWEzZTA7LS1lcnI6I2ZmODA4MDtjb2xvci1zY2hlbWU6ZGFya30KICBAbWVkaWEgKHByZWZlcnMtY29sb3Itc2NoZW1lOmxpZ2h0KXs6cm9vdHstLWJnOiNlZWYzZjY7LS1yYWlsOiNmZmY7LS1maWVsZDojZjRmOGZhOy0taW5rOiMxNDIzMmU7LS1tdXRlOiM1YjczODQ7LS1saW5lOiNjZGRiZTM7LS1hY2NlbnQ6IzBiOGY3YjstLWFjY2VudC1pbms6I2ZmZjstLXRnOiMxYjg2YmQ7LS1lcnI6I2MyM2IzYjtjb2xvci1zY2hlbWU6bGlnaHR9fQogICp7Ym94LXNpemluZzpib3JkZXItYm94fQogIGh0bWwsYm9keXttYXJnaW46MDtiYWNrZ3JvdW5kOnZhcigtLWJnKTtjb2xvcjp2YXIoLS1pbmspO2ZvbnQ6MTZweC8xLjUgc3lzdGVtLXVpLC1hcHBsZS1zeXN0ZW0sIlNlZ29lIFVJIixSb2JvdG8sc2Fucy1zZXJpZn0KICBtYWlue21heC13aWR0aDo1MjBweDttYXJnaW46MCBhdXRvO3BhZGRpbmc6Y2FsYygxOHB4ICsgZW52KHNhZmUtYXJlYS1pbnNldC10b3AsMHB4KSkgMTZweCBjYWxjKDMycHggKyBlbnYoc2FmZS1hcmVhLWluc2V0LWJvdHRvbSwwcHgpKX0KICBoZWFkZXJ7bWFyZ2luLWJvdHRvbToxOHB4fQogIGgxe2ZvbnQtc2l6ZToxLjJyZW07bWFyZ2luOjAgMCAycHg7Zm9udC13ZWlnaHQ6NjAwfQogIGhlYWRlciBwe21hcmdpbjowO2NvbG9yOnZhcigtLW11dGUpO2ZvbnQtc2l6ZTouODhyZW19CiAgLmNhcmR7YmFja2dyb3VuZDp2YXIoLS1yYWlsKTtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JvcmRlci1yYWRpdXM6NnB4O3BhZGRpbmc6MTZweDttYXJnaW4tYm90dG9tOjEycHh9CiAgLmt7ZGlzcGxheTpibG9jaztjb2xvcjp2YXIoLS1tdXRlKTtmb250LXNpemU6LjgycmVtfQogIC52e2ZvbnQtc2l6ZToxLjA1cmVtO2ZvbnQtd2VpZ2h0OjYwMDtvdmVyZmxvdy13cmFwOmFueXdoZXJlO21hcmdpbjoycHggMCA4cHh9CiAgLnRhZ3tkaXNwbGF5OmlubGluZS1ibG9jaztmb250LXNpemU6Ljc4cmVtO3BhZGRpbmc6MnB4IDhweDtib3JkZXItcmFkaXVzOjRweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWFjY2VudCk7Y29sb3I6dmFyKC0tYWNjZW50KX0KICAuZGVme21hcmdpbi10b3A6MTBweDtmb250LXNpemU6LjgycmVtO2NvbG9yOnZhcigtLW11dGUpO292ZXJmbG93LXdyYXA6YW55d2hlcmV9CiAgbGFiZWx7ZGlzcGxheTpibG9jaztmb250LXNpemU6Ljg2cmVtO2ZvbnQtd2VpZ2h0OjUwMDttYXJnaW4tYm90dG9tOjZweH0KICBpbnB1dFt0eXBlPXVybF17d2lkdGg6MTAwJTttaW4taGVpZ2h0OjQ0cHg7cGFkZGluZzoxMHB4IDEycHg7Ym9yZGVyLXJhZGl1czo2cHg7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1saW5lKTtiYWNrZ3JvdW5kOnZhcigtLWZpZWxkKTtjb2xvcjp2YXIoLS1pbmspO2ZvbnQ6aW5oZXJpdH0KICBpbnB1dDpmb2N1cy12aXNpYmxlLGJ1dHRvbjpmb2N1cy12aXNpYmxle291dGxpbmU6MnB4IHNvbGlkIHZhcigtLWFjY2VudCk7b3V0bGluZS1vZmZzZXQ6MnB4fQogIC5yb3d7ZGlzcGxheTpmbGV4O2dhcDo4cHg7bWFyZ2luLXRvcDoxMHB4fQogIGJ1dHRvbnttaW4taGVpZ2h0OjQ0cHg7cGFkZGluZzoxMHB4IDE0cHg7Ym9yZGVyLXJhZGl1czo2cHg7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1saW5lKTtiYWNrZ3JvdW5kOnRyYW5zcGFyZW50O2NvbG9yOnZhcigtLWluayk7Zm9udDo1MDAgLjk1cmVtIHN5c3RlbS11aSxzYW5zLXNlcmlmO2N1cnNvcjpwb2ludGVyfQogIGJ1dHRvbi5wcmltYXJ5e2JhY2tncm91bmQ6dmFyKC0tYWNjZW50KTtib3JkZXItY29sb3I6dmFyKC0tYWNjZW50KTtjb2xvcjp2YXIoLS1hY2NlbnQtaW5rKTtmb250LXdlaWdodDo2MDA7ZmxleDoxfQogIGJ1dHRvbi5mdWxse3dpZHRoOjEwMCV9CiAgYnV0dG9uLnRne3dpZHRoOjEwMCU7Ym9yZGVyLWNvbG9yOnZhcigtLXRnKTtjb2xvcjp2YXIoLS10Zyk7bWFyZ2luLWJvdHRvbToxMnB4fQogIC5zdy1yb3d7ZGlzcGxheTpmbGV4O2FsaWduLWl0ZW1zOmNlbnRlcjtqdXN0aWZ5LWNvbnRlbnQ6c3BhY2UtYmV0d2VlbjtnYXA6MTJweDttYXJnaW4tYm90dG9tOjEycHh9CiAgLnN3LXJvdyBzbWFsbHtkaXNwbGF5OmJsb2NrO2NvbG9yOnZhcigtLW11dGUpO2ZvbnQtc2l6ZTouOHJlbX0KICAuc3d7cG9zaXRpb246cmVsYXRpdmU7ZmxleDpub25lO3dpZHRoOjQ4cHg7aGVpZ2h0OjI4cHh9CiAgLnN3IGlucHV0e3Bvc2l0aW9uOmFic29sdXRlO2luc2V0OjA7b3BhY2l0eTowO3dpZHRoOjEwMCU7aGVpZ2h0OjEwMCU7bWFyZ2luOjA7Y3Vyc29yOnBvaW50ZXJ9CiAgLnN3IHNwYW57cG9zaXRpb246YWJzb2x1dGU7aW5zZXQ6MDtib3JkZXItcmFkaXVzOjE0cHg7YmFja2dyb3VuZDp2YXIoLS1saW5lKTt0cmFuc2l0aW9uOmJhY2tncm91bmQgLjE1c30KICAuc3cgc3BhbjphZnRlcntjb250ZW50OiIiO3Bvc2l0aW9uOmFic29sdXRlO2xlZnQ6M3B4O3RvcDozcHg7d2lkdGg6MjJweDtoZWlnaHQ6MjJweDtib3JkZXItcmFkaXVzOjUwJTtiYWNrZ3JvdW5kOiNmZmY7dHJhbnNpdGlvbjp0cmFuc2Zvcm0gLjE1c30KICAuc3cgaW5wdXQ6Y2hlY2tlZCArIHNwYW57YmFja2dyb3VuZDp2YXIoLS1hY2NlbnQpfQogIC5zdyBpbnB1dDpjaGVja2VkICsgc3BhbjphZnRlcnt0cmFuc2Zvcm06dHJhbnNsYXRlWCgyMHB4KX0KICAuc3cgaW5wdXQ6Zm9jdXMtdmlzaWJsZSArIHNwYW57b3V0bGluZToycHggc29saWQgdmFyKC0tYWNjZW50KTtvdXRsaW5lLW9mZnNldDoycHh9CiAgI21zZ3ttaW4taGVpZ2h0OjEuNGVtO2ZvbnQtc2l6ZTouODhyZW07bWFyZ2luOjRweCAwIDhweH0KICAjbXNnLm9re2NvbG9yOnZhcigtLWFjY2VudCl9ICNtc2cuZXJye2NvbG9yOnZhcigtLWVycil9CiAgLm5vdGV7Y29sb3I6dmFyKC0tbXV0ZSk7Zm9udC1zaXplOi44cmVtO21hcmdpbjowIDAgMTZweH0KPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPG1haW4+CiAgPGhlYWRlcj4KICAgIDxoMT5Eb21haW4gYXlhcmxhcsSxPC9oMT4KICAgIDxwPktheW5hayBzaXRlbmluIGFkcmVzaW5pIGJ1cmFkYW4gecO2bmV0LjwvcD4KICA8L2hlYWRlcj4KCiAgPHNlY3Rpb24gY2xhc3M9ImNhcmQiPgogICAgPHNwYW4gY2xhc3M9ImsiPkFrdGlmIGRvbWFpbjwvc3Bhbj4KICAgIDxkaXYgY2xhc3M9InYiIGlkPSJjdXIiPuKAlDwvZGl2PgogICAgPHNwYW4gY2xhc3M9InRhZyIgaWQ9InNyYyIgaGlkZGVuPjwvc3Bhbj4KICAgIDxkaXYgY2xhc3M9ImRlZiI+Q1MzIHZhcnNhecSxbGFuxLE6IDxzcGFuIGlkPSJkZWYiPuKAlDwvc3Bhbj48L2Rpdj4KICA8L3NlY3Rpb24+CgogIDxzZWN0aW9uIGNsYXNzPSJjYXJkIj4KICAgIDxsYWJlbCBmb3I9ImRvbSI+RG9tYWluJ2kgZWxsZSBkZcSfacWfdGlyPC9sYWJlbD4KICAgIDxpbnB1dCBpZD0iZG9tIiB0eXBlPSJ1cmwiIGlucHV0bW9kZT0idXJsIiBwbGFjZWhvbGRlcj0iaHR0cHM6Ly95ZW5pLWRvbWFpbi5jb20iIGF1dG9jYXBpdGFsaXplPSJvZmYiIGF1dG9jb3JyZWN0PSJvZmYiIHNwZWxsY2hlY2s9ImZhbHNlIj4KICAgIDxkaXYgY2xhc3M9InJvdyI+CiAgICAgIDxidXR0b24gY2xhc3M9InByaW1hcnkiIGlkPSJzYXZlIj5LYXlkZXQ8L2J1dHRvbj4KICAgICAgPGJ1dHRvbiBpZD0icmVzZXQiPlZhcnNhecSxbGFuYSBkw7ZuPC9idXR0b24+CiAgICA8L2Rpdj4KICA8L3NlY3Rpb24+CgogIDxzZWN0aW9uIGNsYXNzPSJjYXJkIiBpZD0icmVtb3RlQ2FyZCIgaGlkZGVuPgogICAgPGRpdiBjbGFzcz0ic3ctcm93Ij4KICAgICAgPGRpdj48Yj5PdG9tYXRpayBnw7xuY2VsbGU8L2I+PHNtYWxsPmRvbWFpbnMuanNvbiBoZXIgYcOnxLFsxLHFn3RhIG9rdW51cjwvc21hbGw+PC9kaXY+CiAgICAgIDxsYWJlbCBjbGFzcz0ic3ciIGFyaWEtbGFiZWw9Ik90b21hdGlrIGfDvG5jZWxsZSI+PGlucHV0IHR5cGU9ImNoZWNrYm94IiBpZD0iYXV0byI+PHNwYW4+PC9zcGFuPjwvbGFiZWw+CiAgICA8L2Rpdj4KICAgIDxidXR0b24gY2xhc3M9ImZ1bGwiIGlkPSJmZXRjaCI+ZG9tYWlucy5qc29uJ2RhbiDFn2ltZGkgZ8O8bmNlbGxlPC9idXR0b24+CiAgPC9zZWN0aW9uPgoKICA8YnV0dG9uIGNsYXNzPSJ0ZyIgaWQ9InRnIiBoaWRkZW4+VGVsZWdyYW0ga2FuYWzEsW5hIGdpdDwvYnV0dG9uPgoKICA8cCBpZD0ibXNnIiByb2xlPSJzdGF0dXMiPjwvcD4KICA8cCBjbGFzcz0ibm90ZSI+RGXEn2nFn2lrbGlrbGVyIGVrbGVudGkgeWVuaWRlbiB5w7xrbGVuaW5jZSB2ZXlhIHV5Z3VsYW1hIHllbmlkZW4gYcOnxLFsxLFuY2EgZ2XDp2VybGkgb2x1ci48L3A+CiAgPGJ1dHRvbiBjbGFzcz0iZnVsbCIgaWQ9ImNsb3NlIj5LYXBhdDwvYnV0dG9uPgo8L21haW4+CjxzY3JpcHQ+CihmdW5jdGlvbigpewogIHZhciBBID0gd2luZG93LkFuZHJvaWQ7CiAgdmFyICQgPSBmdW5jdGlvbihpKXsgcmV0dXJuIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKGkpOyB9OwogIHZhciBzdCA9IHt9OwogIGZ1bmN0aW9uIG1zZyh0LCBjKXsgdmFyIG0gPSAkKCdtc2cnKTsgbS50ZXh0Q29udGVudCA9IHQgfHwgJyc7IG0uY2xhc3NOYW1lID0gYyB8fCAnJzsgfQogIGZ1bmN0aW9uIHJlbmRlcigpewogICAgdHJ5IHsgc3QgPSBKU09OLnBhcnNlKEEuZ2V0U3RhdGUoKSB8fCAne30nKTsgfSBjYXRjaCAoZSkgeyBzdCA9IHt9OyB9CiAgICAkKCdkZWYnKS50ZXh0Q29udGVudCA9IHN0LmRlZiB8fCAnaGVuw7x6IG9rdW5tYWTEsSc7CiAgICAkKCdjdXInKS50ZXh0Q29udGVudCA9IHN0LmRlZiA/IChzdC5kb21haW4gfHwgc3QuZGVmKSA6ICfigJQnOwogICAgdmFyIHMgPSAhc3QuZGVmID8gJycgOiAoc3QubWFudWFsID8gJ0VsbGUgZ2lyaWxkaScgOiAoc3QuZG9tYWluICYmIHN0LmRvbWFpbiAhPT0gc3QuZGVmID8gJ2RvbWFpbnMuanNvbicgOiAnQ1MzIHZhcnNhecSxbGFuxLEnKSk7CiAgICAkKCdzcmMnKS50ZXh0Q29udGVudCA9IHM7ICQoJ3NyYycpLmhpZGRlbiA9ICFzOwogICAgJCgnZG9tJykudmFsdWUgPSBzdC5tYW51YWwgPyAoc3QuZG9tYWluIHx8ICcnKSA6ICcnOwogICAgJCgnYXV0bycpLmNoZWNrZWQgPSAhIXN0LmF1dG87CiAgICAkKCdyZW1vdGVDYXJkJykuaGlkZGVuID0gIXN0LnJlbW90ZTsKICAgICQoJ3RnJykuaGlkZGVuID0gIXN0LnRnOwogIH0KICBpZiAoIUEpIHsgbXNnKCdVeWd1bGFtYSBrw7ZwcsO8c8O8IGJ1bHVuYW1hZMSxLicsICdlcnInKTsgcmV0dXJuOyB9CiAgJCgnc2F2ZScpLm9uY2xpY2sgPSBmdW5jdGlvbigpewogICAgdmFyIHYgPSAkKCdkb20nKS52YWx1ZS50cmltKCk7CiAgICBpZiAoIXYpIHsgbXNnKCdCaXIgZG9tYWluIHlhei4nLCAnZXJyJyk7IHJldHVybjsgfQogICAgaWYgKCFzdC5kZWYpIHsgbXNnKCdEb21haW4gaGVuw7x6IG9rdW5tYWTEsS4gRWtsZW50aXlpIGJpciBrZXoga3VsbGFuxLFwIHRla3JhciBkZW5lLicsICdlcnInKTsgcmV0dXJuOyB9CiAgICBBLnNhdmUodik7IG1zZygnS2F5ZGVkaWxkaS4nLCAnb2snKTsgcmVuZGVyKCk7CiAgfTsKICAkKCdyZXNldCcpLm9uY2xpY2sgPSBmdW5jdGlvbigpeyBBLnNhdmUoJycpOyBtc2coJ1ZhcnNhecSxbGFuYSBkw7Zuw7xsZMO8LicsICdvaycpOyByZW5kZXIoKTsgfTsKICAkKCdhdXRvJykub25jaGFuZ2UgPSBmdW5jdGlvbigpeyBBLnNldEF1dG8oJCgnYXV0bycpLmNoZWNrZWQpOyBtc2coJCgnYXV0bycpLmNoZWNrZWQgPyAnT3RvbWF0aWsgZ8O8bmNlbGxlbWUgYcOnxLFrLicgOiAnT3RvbWF0aWsgZ8O8bmNlbGxlbWUga2FwYWzEsS4nLCAnb2snKTsgcmVuZGVyKCk7IH07CiAgJCgnZmV0Y2gnKS5vbmNsaWNrID0gZnVuY3Rpb24oKXsgbXNnKCdPa3VudXlvcuKApicpOyBBLmZldGNoRnJvbVJlcG8oKTsgfTsKICAkKCd0ZycpLm9uY2xpY2sgPSBmdW5jdGlvbigpeyBBLm9wZW5UZWxlZ3JhbSgpOyB9OwogICQoJ2Nsb3NlJykub25jbGljayA9IGZ1bmN0aW9uKCl7IEEuY2xvc2UoKTsgfTsKICB3aW5kb3cub25GZXRjaGVkID0gZnVuY3Rpb24oZCwgZSl7IGlmIChlKSBtc2coZSwgJ2VycicpOyBlbHNlIHsgbXNnKCdHw7xuY2VsbGVuZGkuJywgJ29rJyk7IHJlbmRlcigpOyB9IH07CiAgcmVuZGVyKCk7Cn0pKCk7Cjwvc2NyaXB0Pgo8L2JvZHk+CjwvaHRtbD4K";
+    static final String HTML = "PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InRyIj4KPGhlYWQ+CjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij4KPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xIj4KPHRpdGxlPkRvbWFpbiBBeWFyxLE8L3RpdGxlPgo8c3R5bGU+CiAgOnJvb3R7LS1iZzojMTYyMjJjOy0tcGFuZWw6IzFlMmUzYjstLWluazojZWFmMWY0Oy0tbXV0ZTojOGZhNWIzOy0tbGluZTojMzI0OTVhOy0tYWNjZW50OiMyZmQwYjU7LS10ZzojMmFhM2UwOy0tZXJyOiNmZjdhN2E7Y29sb3Itc2NoZW1lOmRhcmt9CiAgQG1lZGlhIChwcmVmZXJzLWNvbG9yLXNjaGVtZTpsaWdodCl7OnJvb3R7LS1iZzojZWVmM2Y1Oy0tcGFuZWw6I2ZmZjstLWluazojMTQyMzJlOy0tbXV0ZTojNWQ3Njg2Oy0tbGluZTojY2RkYWUxOy0tYWNjZW50OiMwYzlhODU7LS10ZzojMWI4NmJkOy0tZXJyOiNjNjNhM2E7Y29sb3Itc2NoZW1lOmxpZ2h0fX0KICAqe2JveC1zaXppbmc6Ym9yZGVyLWJveH0KICBodG1sLGJvZHl7bWFyZ2luOjA7YmFja2dyb3VuZDp2YXIoLS1iZyk7Y29sb3I6dmFyKC0taW5rKTtmb250OjE2cHgvMS40NSBzeXN0ZW0tdWksc2Fucy1zZXJpZn0KICBtYWlue21heC13aWR0aDo0MjBweDttYXJnaW46MCBhdXRvO3BhZGRpbmc6MjBweCAxNnB4IDI4cHh9CiAgaDF7Zm9udC1zaXplOjEuMnJlbTttYXJnaW46MCAwIDRweH0KICBwLnN1YnttYXJnaW46MCAwIDE4cHg7Y29sb3I6dmFyKC0tbXV0ZSk7Zm9udC1zaXplOi45cmVtfQogIC5ib3h7YmFja2dyb3VuZDp2YXIoLS1wYW5lbCk7Ym9yZGVyOjFweCBzb2xpZCB2YXIoLS1saW5lKTtib3JkZXItcmFkaXVzOjEwcHg7cGFkZGluZzoxNHB4fQogIGxhYmVse2Rpc3BsYXk6YmxvY2s7Zm9udC1zaXplOi44NXJlbTtjb2xvcjp2YXIoLS1tdXRlKTttYXJnaW4tYm90dG9tOjZweH0KICAuY3Vye2ZvbnQ6Ljg1cmVtIHVpLW1vbm9zcGFjZSxtb25vc3BhY2U7d29yZC1icmVhazpicmVhay1hbGw7bWFyZ2luOjAgMCAxNHB4fQogIGlucHV0e3dpZHRoOjEwMCU7cGFkZGluZzoxMnB4O2JvcmRlci1yYWRpdXM6OHB4O2JvcmRlcjoxcHggc29saWQgdmFyKC0tbGluZSk7YmFja2dyb3VuZDp0cmFuc3BhcmVudDtjb2xvcjp2YXIoLS1pbmspO2ZvbnQ6aW5oZXJpdH0KICBpbnB1dDpmb2N1cy12aXNpYmxlLGJ1dHRvbjpmb2N1cy12aXNpYmxle291dGxpbmU6MnB4IHNvbGlkIHZhcigtLWFjY2VudCk7b3V0bGluZS1vZmZzZXQ6MnB4fQogIC5yb3d7ZGlzcGxheTpmbGV4O2dhcDoxMHB4O21hcmdpbi10b3A6MTJweH0KICBidXR0b257ZmxleDoxO3BhZGRpbmc6MTJweDtib3JkZXItcmFkaXVzOjhweDtib3JkZXI6MXB4IHNvbGlkIHZhcigtLWxpbmUpO2JhY2tncm91bmQ6dHJhbnNwYXJlbnQ7Y29sb3I6dmFyKC0taW5rKTtmb250OmluaGVyaXQ7Zm9udC13ZWlnaHQ6NjAwO2N1cnNvcjpwb2ludGVyfQogIGJ1dHRvbi5zYXZle2JhY2tncm91bmQ6dmFyKC0tYWNjZW50KTtib3JkZXItY29sb3I6dmFyKC0tYWNjZW50KTtjb2xvcjojMDYyNDFmfQogIGJ1dHRvbi50Z3t3aWR0aDoxMDAlO21hcmdpbi10b3A6MTJweDtib3JkZXItY29sb3I6dmFyKC0tdGcpO2NvbG9yOnZhcigtLXRnKX0KICBidXR0b246ZGlzYWJsZWR7b3BhY2l0eTouNX0KICAjbXNne21pbi1oZWlnaHQ6MS40ZW07bWFyZ2luOjEycHggMCAwO2ZvbnQtc2l6ZTouOXJlbX0KICAjbXNnLmVycntjb2xvcjp2YXIoLS1lcnIpfSAjbXNnLm9re2NvbG9yOnZhcigtLWFjY2VudCl9Cjwvc3R5bGU+CjwvaGVhZD4KPGJvZHk+CjxtYWluPgogIDxoMT5TaXRlIGFkcmVzaTwvaDE+CiAgPHAgY2xhc3M9InN1YiI+RWtsZW50aW5pbiBrdWxsYW5kxLHEn8SxIGRvbWFpbidpIGJ1cmFkYW4gZGXEn2nFn3RpcmViaWxpcnNpbi48L3A+CgogIDxkaXYgY2xhc3M9ImJveCI+CiAgICA8bGFiZWw+xZ51IGFua2kgYWRyZXM8L2xhYmVsPgogICAgPHAgY2xhc3M9ImN1ciIgaWQ9ImN1ciI+LTwvcD4KCiAgICA8bGFiZWwgZm9yPSJ1cmwiPlllbmkgYWRyZXM8L2xhYmVsPgogICAgPGlucHV0IGlkPSJ1cmwiIHR5cGU9InVybCIgaW5wdXRtb2RlPSJ1cmwiIGF1dG9jb21wbGV0ZT0ib2ZmIiBwbGFjZWhvbGRlcj0iaHR0cHM6Ly9vcm5lay5jb20iPgoKICAgIDxkaXYgY2xhc3M9InJvdyI+CiAgICAgIDxidXR0b24gaWQ9InB1bGwiIHR5cGU9ImJ1dHRvbiI+UmVwb2RhbiDDp2VrPC9idXR0b24+CiAgICAgIDxidXR0b24gaWQ9InNhdmUiIGNsYXNzPSJzYXZlIiB0eXBlPSJidXR0b24iPktheWRldDwvYnV0dG9uPgogICAgPC9kaXY+CiAgICA8cCBpZD0ibXNnIiByb2xlPSJzdGF0dXMiPjwvcD4KICA8L2Rpdj4KCiAgPGJ1dHRvbiBpZD0idGciIGNsYXNzPSJ0ZyIgdHlwZT0iYnV0dG9uIj5UZWxlZ3JhbTwvYnV0dG9uPgo8L21haW4+Cgo8c2NyaXB0Pgpjb25zdCAkID0gaWQgPT4gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoaWQpOwpjb25zdCBtc2cgPSAodCwgYykgPT4geyAkKCdtc2cnKS50ZXh0Q29udGVudCA9IHQ7ICQoJ21zZycpLmNsYXNzTmFtZSA9IGMgfHwgJyc7IH07CgovLyBBbmRyb2lkIGvDtnByw7xzw7wgeW9rc2EgdGFyYXnEsWPEsWRhIHRlc3QgacOnaW4gc2FodGUgbmVzbmUKY29uc3QgQSA9IHdpbmRvdy5BbmRyb2lkIHx8IHsKICBnZXREb21haW46ICgpID0+IGxvY2FsU3RvcmFnZS5kIHx8ICdodHRwczovL29ybmVrLmNvbScsCiAgZmV0Y2hGcm9tUmVwbzogKCkgPT4gc2V0VGltZW91dCgoKSA9PiB3aW5kb3cub25GZXRjaGVkKCdodHRwczovL3llbmktb3JuZWsuY29tJywgJycpLCA1MDApLAogIHNhdmU6IHUgPT4geyBsb2NhbFN0b3JhZ2UuZCA9IHU7IH0sCiAgb3BlblRlbGVncmFtOiAoKSA9PiB3aW5kb3cub3BlbignaHR0cHM6Ly90Lm1lLycpCn07CgpmdW5jdGlvbiBzaG93KHUpeyAkKCdjdXInKS50ZXh0Q29udGVudCA9IHUgfHwgJy0nOyAkKCd1cmwnKS52YWx1ZSA9IHUgfHwgJyc7IH0Kc2hvdyhBLmdldERvbWFpbigpKTsKCi8vIExpbmsgdGFuxLFtbMSxIGRlxJ9pbHNlIGlsZ2lsaSBidXRvbmxhciBnaXpsZW5pcgppZiAodHlwZW9mIEEuaGFzVGVsZWdyYW0gPT09ICdmdW5jdGlvbicgJiYgIUEuaGFzVGVsZWdyYW0oKSkgJCgndGcnKS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwppZiAodHlwZW9mIEEuaGFzUmVtb3RlID09PSAnZnVuY3Rpb24nICYmICFBLmhhc1JlbW90ZSgpKSAkKCdwdWxsJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKCi8vIEtvdGxpbiB0YXJhZsSxIGJ1IGZvbmtzaXlvbnUgw6dhxJ/EsXLEsXIKd2luZG93Lm9uRmV0Y2hlZCA9ICh1cmwsIGVycm9yKSA9PiB7CiAgJCgncHVsbCcpLmRpc2FibGVkID0gZmFsc2U7CiAgaWYgKGVycm9yKSByZXR1cm4gbXNnKGVycm9yLCAnZXJyJyk7CiAgJCgndXJsJykudmFsdWUgPSB1cmw7CiAgbXNnKCdSZXBvZGFuIMOnZWtpbGRpLiBLYXlkZXRcJ2UgYmFzYXJhayB1eWd1bGEuJywgJ29rJyk7Cn07CgokKCdwdWxsJykub25jbGljayA9ICgpID0+IHsgJCgncHVsbCcpLmRpc2FibGVkID0gdHJ1ZTsgbXNnKCfDh2VraWxpeW9yLi4uJyk7IEEuZmV0Y2hGcm9tUmVwbygpOyB9OwoKJCgnc2F2ZScpLm9uY2xpY2sgPSAoKSA9PiB7CiAgY29uc3QgdSA9ICQoJ3VybCcpLnZhbHVlLnRyaW0oKS5yZXBsYWNlKC9cLyskLywgJycpOwogIGlmICghL15odHRwcz86XC9cL1teXHMvXStcLlteXHMvXSsvLnRlc3QodSkpIHJldHVybiBtc2coJ0dlw6dlcmxpIGJpciBhZHJlcyBnaXIgKGh0dHBzOi8vLi4uKS4nLCAnZXJyJyk7CiAgQS5zYXZlKHUpOyBzaG93KHUpOyBtc2coJ0theWRlZGlsZGkuJywgJ29rJyk7Cn07CgokKCd0ZycpLm9uY2xpY2sgPSAoKSA9PiBBLm9wZW5UZWxlZ3JhbSgpOwo8L3NjcmlwdD4KPC9ib2R5Pgo8L2h0bWw+Cg==";
+    static final boolean DEBUG = true;
     static boolean started = false;
+    static int binds = 0;
 
     public static void init(Object plugin) { init(plugin, null); }
 
     public static void init(final Object plugin, Context ctx) {
         try { if (ctx != null) DomainStore.app = ctx.getApplicationContext(); } catch (Throwable t) { }
-        try { bind(plugin); } catch (Throwable t) { }
+        toast("Domain hook yuklendi");
+        try { bind(plugin); } catch (Throwable t) { toast("Domain hook hata: " + t); }
         try {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                public void run() { try { bind(plugin); } catch (Throwable t) { } }
+                public void run() { try { bind(plugin); } catch (Throwable t) { toast("Domain hook hata: " + t); } }
             }, 2500);
         } catch (Throwable t) { }
         if (!started) {
@@ -40,22 +43,44 @@ public class Hook {
         }
     }
 
+    static void toast(final String msg) {
+        if (!DEBUG) return;
+        try {
+            final Context c = DomainStore.ctx();
+            if (c == null) return;
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                public void run() {
+                    try { android.widget.Toast.makeText(c, msg, android.widget.Toast.LENGTH_LONG).show(); } catch (Throwable t) { }
+                }
+            });
+        } catch (Throwable t) { }
+    }
+
     static void bind(Object plugin) throws Exception {
         Method setter = null;
         for (Method m : plugin.getClass().getMethods()) {
             if (m.getName().equals("setOpenSettings") && m.getParameterTypes().length == 1) setter = m;
         }
-        if (setter == null) return;
-        Class<?> fn = setter.getParameterTypes()[0];
+        java.lang.reflect.Field field = null;
+        Class<?> fn;
+        if (setter != null) {
+            fn = setter.getParameterTypes()[0];
+        } else {
+            for (Class<?> c = plugin.getClass(); c != null && field == null; c = c.getSuperclass()) {
+                try { field = c.getDeclaredField("openSettings"); } catch (NoSuchFieldException e) { }
+            }
+            if (field == null) { toast("Domain hook: openSettings bulunamadi"); return; }
+            field.setAccessible(true);
+            fn = field.getType();
+        }
         final Object unit = Class.forName("kotlin.Unit").getField("INSTANCE").get(null);
         Object proxy = Proxy.newProxyInstance(fn.getClassLoader(), new Class<?>[] { fn }, new InvocationHandler() {
             public Object invoke(Object p, Method m, Object[] a) {
                 String n = m.getName();
                 if (n.equals("invoke")) {
-                    if (a != null && a.length > 0) {
-                        Activity act = activity(a[0]);
-                        if (act != null) show(act);
-                    }
+                    Activity act = (a != null && a.length > 0) ? activity(a[0]) : null;
+                    if (act != null) show(act);
+                    else toast("Domain hook: Activity bulunamadi");
                     return unit;
                 }
                 if (n.equals("hashCode")) return Integer.valueOf(0);
@@ -64,7 +89,9 @@ public class Hook {
                 return null;
             }
         });
-        setter.invoke(plugin, proxy);
+        if (setter != null) setter.invoke(plugin, proxy); else field.set(plugin, proxy);
+        binds++;
+        if (binds == 1) toast("Domain hook: ayar butonu baglandi");
     }
 
     static Activity activity(Object o) {
@@ -83,14 +110,14 @@ public class Hook {
                     Dialog d = new Dialog(act, android.R.style.Theme_DeviceDefault_NoActionBar);
                     WebView w = new WebView(act);
                     w.getSettings().setJavaScriptEnabled(true);
-                    w.setBackgroundColor(0xFF0D1820);
+                    w.setBackgroundColor(0xFF16222C);
                     w.addJavascriptInterface(new Bridge(act, w, d), "Android");
                     String html = new String(Base64.decode(HTML, Base64.DEFAULT), "UTF-8");
                     w.loadDataWithBaseURL(null, html, "text/html", "utf-8", null);
                     d.setContentView(w);
                     d.show();
                     d.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-                } catch (Throwable t) { }
+                } catch (Throwable t) { toast("Popup hatasi: " + t); }
             }
         });
     }
@@ -122,7 +149,18 @@ public class Hook {
             } catch (Throwable t) { return "{}"; }
         }
 
-        @JavascriptInterface public void save(String u) { DomainStore.setManual(u); }
+        @JavascriptInterface public String getDomain() { return DomainStore.read(DomainStore.def()); }
+
+        @JavascriptInterface public boolean hasTelegram() { return TG.length() > 0; }
+
+        @JavascriptInterface public boolean hasRemote() { return DomainStore.RAW.length() > 0; }
+
+        // domains.json'daki degerle ayniysa elle girilen kaydi sil: otomatik guncelleme calismaya devam etsin
+        @JavascriptInterface public void save(String u) {
+            String r = DomainStore.remoteFor(DomainStore.def());
+            if (u != null && r != null && DomainStore.norm(u).equals(DomainStore.norm(r))) DomainStore.setManual("");
+            else DomainStore.setManual(u);
+        }
 
         @JavascriptInterface public void setAuto(boolean b) { DomainStore.setAuto(b); }
 
@@ -134,7 +172,12 @@ public class Hook {
             new Thread(new Runnable() {
                 public void run() {
                     String err = DomainStore.fetchRemote();
-                    String dom = DomainStore.read(DomainStore.def());
+                    String dom = "";
+                    if (err == null) {
+                        String r = DomainStore.remoteFor(DomainStore.def());
+                        if (r == null) err = "domains.json icinde bu domain icin kayit yok";
+                        else dom = r.trim();
+                    }
                     js("onFetched(" + JSONObject.quote(dom) + "," + JSONObject.quote(err == null ? "" : err) + ")");
                 }
             }).start();
