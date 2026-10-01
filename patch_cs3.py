@@ -1,85 +1,126 @@
 #!/usr/bin/env python3
-"""
-CS3 otomatik yama scripti.
-  1) classes.dex -> smali
-  2) Sabit domain string'ini DomainStore.read() çağrısıyla değiştirir
-  3) Plugin.load() başına Hook.init(this, context) ekler (ayarlar popup'ı)
-  4) smali -> dex, helper.dex'i classesN.dex olarak ekler, yeni .cs3 yazar
+"""CS3 otomatik yama scripti.
 
-Gereken: java, tools/lib/*.jar (smali+baksmali), helper.dex (workflow üretir)
+  1) classes*.dex -> smali
+  2) Sabit domain string'inin ardina DomainStore.read(domain) cagrisi eklenir
+  3) Plugin.load(Context) basina Hook.init(this, context) eklenir (ayar popup'i)
+  4) smali -> dex, helper.dex yeni classesN.dex olarak pakete eklenir
 
-Kullanım:
+Gerekenler: java, tools/lib/*.jar (smali + baksmali), helper.dex
+
+Kullanim:
   python patch_cs3.py Provider.cs3 --list
   python patch_cs3.py Provider.cs3 --domain https://eski.com -o Provider.patched.cs3
 """
-import argparse, re, shutil, subprocess, sys, tempfile, zipfile
+import argparse
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+import zipfile
+from collections import defaultdict
 from pathlib import Path
 
 PKG = "Lcom/example/domainpatch"
-STORE_CALL = f"invoke-static {{}}, {PKG}/DomainStore;->read()Ljava/lang/String;"
-HOOK_CALL = (f"invoke-static/range {{p0 .. p1}}, {PKG}/Hook;->init("
-             "Ljava/lang/Object;Landroid/content/Context;)V")
-CONST_RE = re.compile(r'^(\s*)const-string(?:/jumbo)?\s+([vp]\d+),\s+"(https?://[^"]+)"\s*$')
+READ_SIG = PKG + "/DomainStore;->read(Ljava/lang/String;)Ljava/lang/String;"
+INIT_SIG = PKG + "/Hook;->init(Ljava/lang/Object;Landroid/content/Context;)V"
+API = "33"
+
+CONST_RE = re.compile(r'^(\s*)const-string(?:/jumbo)?\s+([vp]\d+),\s+"(https?://[^"]*)"\s*$')
+SUPER_RE = re.compile(r'^\.super\s+(\S+)')
+LOAD_RE = re.compile(r'\bload\(Landroid/content/Context;\)V')
+LOCALS_RE = re.compile(r'^\s*\.(locals|registers)\s+\d+')
+PLUGIN_SUPERS = {
+    "Lcom/lagradost/cloudstream3/plugins/Plugin;",
+    "Lcom/lagradost/cloudstream3/plugins/BasePlugin;",
+}
 
 
 def run(cmd):
-    r = subprocess.run(cmd, capture_output=True, text=True)
+    r = subprocess.run([str(c) for c in cmd], capture_output=True, text=True)
     if r.returncode:
-        sys.exit(f"Hata: {' '.join(map(str, cmd))}\n{r.stderr}")
+        tail = (r.stderr or r.stdout or "")[-1500:]
+        sys.exit("HATA: komut basarisiz: " + " ".join(str(c) for c in cmd) + "\n" + tail)
+    return r.stdout
 
 
 def norm(u):
     return u.strip().rstrip("/").lower()
 
 
-def list_candidates(smali_dir):
-    seen = {}
-    for f in smali_dir.rglob("*.smali"):
-        for line in f.read_text(encoding="utf-8", errors="ignore").splitlines():
-            m = CONST_RE.match(line)
-            if m:
-                seen.setdefault(m.group(3), set()).add(f.name)
-    for url, files in sorted(seen.items()):
-        print(f"{url}   <- {', '.join(sorted(files))[:80]}")
+def rd(f):
+    return f.read_text(encoding="utf-8", errors="surrogateescape")
 
 
-def patch_domain(smali_dir, domain):
+def wr(f, text):
+    f.write_text(text, encoding="utf-8", errors="surrogateescape")
+
+
+def candidates(sm_dirs):
+    seen = defaultdict(set)
+    for sm in sm_dirs:
+        for f in sm.rglob("*.smali"):
+            for line in rd(f).split("\n"):
+                m = CONST_RE.match(line)
+                if m:
+                    seen[m.group(3)].add(f.name)
+    return seen
+
+
+def print_candidates(seen):
+    if not seen:
+        print("  (CS3 icinde http/https ile baslayan sabit string bulunamadi)")
+        return
+    for url in sorted(seen):
+        print("  " + url + "   <- " + ", ".join(sorted(seen[url]))[:80])
+
+
+def patch_domain(sm, domain):
+    want = norm(domain)
     count = 0
-    for f in smali_dir.rglob("*.smali"):
-        lines = f.read_text(encoding="utf-8").split("\n")
-        out, changed = [], False
-        for line in lines:
+    for f in sm.rglob("*.smali"):
+        out, hit = [], False
+        for line in rd(f).split("\n"):
+            out.append(line)
             m = CONST_RE.match(line)
-            if m and norm(m.group(3)) == norm(domain):
-                out += [f"{m.group(1)}{STORE_CALL}", f"{m.group(1)}move-result-object {m.group(2)}"]
-                changed = True
+            if m and norm(m.group(3)) == want:
+                ind, reg = m.group(1), m.group(2)
+                out.append(ind + "invoke-static/range {" + reg + " .. " + reg + "}, " + READ_SIG)
+                out.append(ind + "move-result-object " + reg)
+                hit = True
                 count += 1
-            else:
-                out.append(line)
-        if changed:
-            f.write_text("\n".join(out), encoding="utf-8")
+        if hit:
+            wr(f, "\n".join(out))
     return count
 
 
-def patch_hook(smali_dir):
-    for f in smali_dir.rglob("*.smali"):
-        text = f.read_text(encoding="utf-8")
-        if ".super Lcom/lagradost/cloudstream3/plugins/Plugin;" not in text:
+def patch_hook(sm):
+    for f in sm.rglob("*.smali"):
+        text = rd(f)
+        lines = text.split("\n")
+        sup = None
+        for line in lines[:12]:
+            m = SUPER_RE.match(line)
+            if m:
+                sup = m.group(1)
+                break
+        if sup not in PLUGIN_SUPERS:
             continue
-        if HOOK_CALL in text:
-            return True  # zaten yamalı
-        lines, out, in_load, done = text.split("\n"), [], False, False
+        if INIT_SIG in text:
+            return True
+        out, in_load, done = [], False, False
         for line in lines:
             out.append(line)
-            if line.startswith(".method") and " load(Landroid/content/Context;)V" in line:
+            if line.startswith(".method") and LOAD_RE.search(line):
                 in_load = True
-            elif in_load and not done and re.match(r"\s*\.(locals|registers)\s+\d+", line):
-                out.append(f"    {HOOK_CALL}")
+            elif in_load and not done and LOCALS_RE.match(line):
+                out.append("    invoke-static/range {p0 .. p1}, " + INIT_SIG)
                 done = True
             elif line.startswith(".end method"):
                 in_load = False
         if done:
-            f.write_text("\n".join(out), encoding="utf-8")
+            wr(f, "\n".join(out))
             return True
     return False
 
@@ -87,44 +128,75 @@ def patch_hook(smali_dir):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cs3")
-    ap.add_argument("--domain", help="CS3 içinde sabit yazılı ESKİ domain")
+    ap.add_argument("--domain", help="CS3 icinde yazili ESKI domain")
     ap.add_argument("--list", action="store_true", help="bulunan URL'leri listele")
     ap.add_argument("--helper", default="helper.dex")
     ap.add_argument("--tools", default="tools")
     ap.add_argument("-o", "--out")
     a = ap.parse_args()
 
-    tools = Path(a.tools)
-    with tempfile.TemporaryDirectory() as t:
-        t = Path(t)
-        x, sm = t / "x", t / "smali"
+    cp = a.tools + "/lib/*"
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp = Path(tmp)
+        x = tmp / "x"
         with zipfile.ZipFile(a.cs3) as z:
             z.extractall(x)
-        run(["java", "-cp", f"{tools}/lib/*", "org.jf.baksmali.Main", "d", x / "classes.dex", "-o", sm])
 
+        dexes = sorted(p for p in x.iterdir() if re.fullmatch(r"classes\d*\.dex", p.name))
+        if not dexes:
+            sys.exit("HATA: CS3 icinde classes.dex yok (dosya gecerli bir CS3 degil)")
+
+        parts = []
+        for i, d in enumerate(dexes):
+            sm = tmp / ("sm%d" % i)
+            run(["java", "-cp", cp, "org.jf.baksmali.Main", "d", d, "-a", API, "-o", sm])
+            parts.append((d, sm))
+
+        seen = candidates([sm for _, sm in parts])
         if a.list:
-            return list_candidates(sm)
+            print("Bulunan URL sabitleri:")
+            print_candidates(seen)
+            return
         if not a.domain:
-            sys.exit("--domain gerekli (önce --list ile bak)")
+            sys.exit("HATA: --domain gerekli (once --list ile bak)")
 
-        n = patch_domain(sm, a.domain)
-        if n == 0:
-            sys.exit("Domain string'i bulunamadı. --list ile tam yazımı kontrol et.")
-        if not patch_hook(sm):
-            sys.exit("Plugin.load() bulunamadı; popup hook'u eklenemedi.")
+        total, changed = 0, set()
+        for d, sm in parts:
+            n = patch_domain(sm, a.domain)
+            if n:
+                total += n
+                changed.add(d)
+        if total == 0:
+            print("Verilen domain: " + a.domain)
+            print("CS3 icinde bulunan URL sabitleri:")
+            print_candidates(seen)
+            sys.exit("HATA: Domain string'i bulunamadi. Yukaridaki listeden birebir yaz.")
 
-        run(["java", "-cp", f"{tools}/lib/*", "org.jf.smali.Main", "a", sm, "-o", x / "classes.dex"])
-        i = 2
-        while (x / f"classes{i}.dex").exists():
-            i += 1
-        shutil.copy(a.helper, x / f"classes{i}.dex")
+        hooked = False
+        for d, sm in parts:
+            if patch_hook(sm):
+                changed.add(d)
+                hooked = True
+                break
+        if not hooked:
+            sys.exit("HATA: Plugin.load(Context) bulunamadi; popup hook'u eklenemedi.")
 
-        out = Path(a.out or Path(a.cs3).with_suffix(".patched.cs3"))
+        for d, sm in parts:
+            if d in changed:
+                run(["java", "-cp", cp, "org.jf.smali.Main", "a", sm, "-a", API, "-o", d])
+
+        n = len(dexes) + 1
+        while (x / ("classes%d.dex" % n)).exists():
+            n += 1
+        shutil.copy(a.helper, x / ("classes%d.dex" % n))
+
+        out = Path(a.out) if a.out else Path(a.cs3).with_suffix(".patched.cs3")
+        out.parent.mkdir(parents=True, exist_ok=True)
         with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
             for p in sorted(x.rglob("*")):
                 if p.is_file():
                     z.write(p, p.relative_to(x).as_posix())
-        print(f"Tamam: {n} domain değiştirildi, popup hook eklendi -> {out}")
+        print("TAMAM: %d domain yerlestirildi, popup hook eklendi -> %s" % (total, out))
 
 
 if __name__ == "__main__":
