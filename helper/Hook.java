@@ -135,21 +135,7 @@ public class Hook {
             });
         }
 
-        @JavascriptInterface public String getState() {
-            try {
-                String def = DomainStore.def();
-                JSONObject o = new JSONObject();
-                o.put("def", def);
-                o.put("domain", DomainStore.read(def));
-                o.put("manual", DomainStore.hasManual());
-                o.put("auto", DomainStore.auto());
-                o.put("tg", TG.length() > 0);
-                o.put("remote", DomainStore.RAW.length() > 0);
-                return o.toString();
-            } catch (Throwable t) { return "{}"; }
-        }
-
-        @JavascriptInterface public String getDomain() { return DomainStore.read(DomainStore.def()); }
+        @JavascriptInterface public String getDomain() { return DomainStore.current(); }
 
         @JavascriptInterface public boolean hasTelegram() { return TG.length() > 0; }
 
@@ -157,7 +143,7 @@ public class Hook {
 
         // domains.json'daki degerle ayniysa elle girilen kaydi sil: otomatik guncelleme calismaya devam etsin
         @JavascriptInterface public void save(String u) {
-            String r = DomainStore.remoteFor(DomainStore.def());
+            String r = DomainStore.remoteFor();
             if (u != null && r != null && DomainStore.norm(u).equals(DomainStore.norm(r))) DomainStore.setManual("");
             else DomainStore.setManual(u);
         }
@@ -174,7 +160,7 @@ public class Hook {
                     String err = DomainStore.fetchRemote();
                     String dom = "";
                     if (err == null) {
-                        String r = DomainStore.remoteFor(DomainStore.def());
+                        String r = DomainStore.remoteFor();
                         if (r == null) err = "domains.json icinde bu domain icin kayit yok";
                         else dom = r.trim();
                     }
