@@ -13,6 +13,7 @@ public class DomainStore {
     static final String RAW = "https://raw.githubusercontent.com/darknesslord19/domain/main/domains.json";
     static final String TOKEN = "";
     static String cur = "";
+    static String curName = "";
 
     static Context ctx() {
         if (app != null) return app;
@@ -35,6 +36,19 @@ public class DomainStore {
         return u;
     }
 
+    // Eklenti adi: kucuk harf, ".cs3" uzantisi yok
+    static String nameKey(String n) {
+        if (n == null) return "";
+        n = n.trim().toLowerCase();
+        if (n.endsWith(".cs3")) n = n.substring(0, n.length() - 4);
+        return n;
+    }
+
+    static String id(String def, String name) {
+        String n = nameKey(name);
+        return n.length() > 0 ? n : norm(def);
+    }
+
     // Orijinal string sonunda "/" varsa aynisini koru
     static String same(String def, String v) {
         if (v == null) return def;
@@ -46,50 +60,67 @@ public class DomainStore {
 
     public static String def() { return cur; }
 
-    public static String read(String def) {
-        cur = def;
+    static String eff(String def, String name) {
         try {
             SharedPreferences p = sp();
             if (p == null) return def;
-            String m = p.getString("m:" + norm(def), "");
+            String m = p.getString("m:" + id(def, name), "");
             if (m.length() > 0) return same(def, m);
             if (p.getBoolean("auto", true)) {
-                String r = lookup(p.getString("remote", ""), def);
+                String r = lookup(p.getString("remote", ""), def, name);
                 if (r != null) return same(def, r);
             }
         } catch (Throwable t) { }
         return def;
     }
 
-    static String lookup(String json, String def) {
+    // Yamali kod "eskiDomain@@EklentiAdi" gonderir
+    public static String read(String arg) {
+        String def = arg == null ? "" : arg;
+        String name = "";
+        int i = def.indexOf("@@");
+        if (i >= 0) {
+            name = def.substring(i + 2);
+            def = def.substring(0, i);
+        }
+        cur = def;
+        curName = name;
+        return eff(def, name);
+    }
+
+    public static String current() { return eff(cur, curName); }
+
+    // domains.json: once eklenti adi, yoksa eski domain anahtari
+    static String lookup(String json, String def, String name) {
         try {
             if (json == null || json.length() == 0) return null;
             JSONObject o = new JSONObject(json);
+            String wantName = nameKey(name);
+            String wantDef = norm(def);
+            String byDef = null;
             Iterator<String> it = o.keys();
-            String want = norm(def);
             while (it.hasNext()) {
                 String k = it.next();
-                if (norm(k).equals(want)) {
-                    String v = o.optString(k, "");
-                    if (v.length() > 0) return v;
-                }
+                String v = o.optString(k, "");
+                if (v.length() == 0) continue;
+                if (wantName.length() > 0 && nameKey(k).equals(wantName)) return v;
+                if (norm(k).equals(wantDef)) byDef = v;
             }
-            String d = o.optString("domain", "");
-            if (d.length() > 0) return d;
+            return byDef;
         } catch (Throwable t) { }
         return null;
     }
 
     // domains.json'daki kayit (yoksa null)
-    public static String remoteFor(String def) {
+    public static String remoteFor() {
         SharedPreferences p = sp();
         if (p == null) return null;
-        return lookup(p.getString("remote", ""), def);
+        return lookup(p.getString("remote", ""), cur, curName);
     }
 
     public static boolean hasManual() {
         SharedPreferences p = sp();
-        return p != null && p.getString("m:" + norm(cur), "").length() > 0;
+        return p != null && p.getString("m:" + id(cur, curName), "").length() > 0;
     }
 
     public static void setManual(String u) {
@@ -97,8 +128,9 @@ public class DomainStore {
         if (p == null || cur.length() == 0) return;
         u = u == null ? "" : u.trim();
         if (u.length() > 0 && !u.toLowerCase().startsWith("http")) u = "https://" + u;
-        if (u.length() == 0) p.edit().remove("m:" + norm(cur)).apply();
-        else p.edit().putString("m:" + norm(cur), u).apply();
+        String key = "m:" + id(cur, curName);
+        if (u.length() == 0) p.edit().remove(key).apply();
+        else p.edit().putString(key, u).apply();
     }
 
     public static boolean auto() {
