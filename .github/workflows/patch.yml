@@ -47,8 +47,6 @@ jobs:
             [ -e "$f" ] || continue
             name=$(basename "$f")
             old=$(jq -r --arg n "$name" '.[$n] // empty' sites.json)
-            echo "== $name | sites.json: '$old'"
-            python patch_cs3.py "$f" --list || true
             [ -n "$old" ] || { echo "skip $name"; continue; }
             python patch_cs3.py "$f" --domain "$old" -o "output/$name"
           done
