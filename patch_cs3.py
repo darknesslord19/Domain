@@ -25,11 +25,14 @@ from pathlib import Path
 PKG = "Lcom/example/domainpatch"
 READ_SIG = PKG + "/DomainStore;->read(Ljava/lang/String;)Ljava/lang/String;"
 INIT_SIG = PKG + "/Hook;->init(Ljava/lang/Object;Landroid/content/Context;)V"
+INIT0_SIG = PKG + "/Hook;->init(Ljava/lang/Object;)V"
 API = "33"
 
 CONST_RE = re.compile(r'^(\s*)const-string(?:/jumbo)?\s+([vp]\d+),\s+"(https?://[^"]*)"\s*$')
 SUPER_RE = re.compile(r'^\.super\s+(\S+)')
-LOAD_RE = re.compile(r'\bload\(Landroid/content/Context;\)V')
+LOAD_CTX_RE = re.compile(r'^\.method\s.*\bload\(Landroid/content/Context;\)V\s*$')
+LOAD_NOARG_RE = re.compile(r'^\.method\s.*\bload\(\)V\s*$')
+PLUGIN_SUPER_RE = re.compile(r'^L.*/(Base)?Plugin;$')
 LOCALS_RE = re.compile(r'^\s*\.(locals|registers)\s+\d+')
 PLUGIN_SUPERS = {
     "Lcom/lagradost/cloudstream3/plugins/Plugin;",
@@ -95,34 +98,65 @@ def patch_domain(sm, domain):
     return count
 
 
+def insert_hook(lines, method_re, call):
+    out, in_m, done = [], False, False
+    for line in lines:
+        out.append(line)
+        if line.startswith(".method") and method_re.match(line):
+            in_m = True
+        elif in_m and not done and LOCALS_RE.match(line):
+            out.append("    " + call)
+            done = True
+        elif line.startswith(".end method"):
+            in_m = False
+    return out, done
+
+
+def super_of(lines):
+    for line in lines[:12]:
+        m = SUPER_RE.match(line)
+        if m:
+            return m.group(1)
+    return ""
+
+
 def patch_hook(sm):
-    for f in sm.rglob("*.smali"):
+    for f in sorted(sm.rglob("*.smali")):
         text = rd(f)
         lines = text.split("\n")
-        sup = None
-        for line in lines[:12]:
-            m = SUPER_RE.match(line)
-            if m:
-                sup = m.group(1)
-                break
-        if sup not in PLUGIN_SUPERS:
+        sup = super_of(lines)
+        if not sup or not (sup in PLUGIN_SUPERS or PLUGIN_SUPER_RE.match(sup)):
             continue
-        if INIT_SIG in text:
+        if INIT_SIG in text or INIT0_SIG in text:
             return True
-        out, in_load, done = [], False, False
-        for line in lines:
-            out.append(line)
-            if line.startswith(".method") and LOAD_RE.search(line):
-                in_load = True
-            elif in_load and not done and LOCALS_RE.match(line):
-                out.append("    invoke-static/range {p0 .. p1}, " + INIT_SIG)
-                done = True
-            elif line.startswith(".end method"):
-                in_load = False
-        if done:
-            wr(f, "\n".join(out))
-            return True
+        # once load(Context), yoksa parametresiz load()
+        variants = (
+            (LOAD_CTX_RE, "invoke-static/range {p0 .. p1}, " + INIT_SIG),
+            (LOAD_NOARG_RE, "invoke-static/range {p0 .. p0}, " + INIT0_SIG),
+        )
+        for method_re, call in variants:
+            out, done = insert_hook(lines, method_re, call)
+            if done:
+                wr(f, "\n".join(out))
+                return True
     return False
+
+
+def describe_plugins(parts):
+    print("Plugin'e benzeyen siniflar:")
+    found = False
+    for _, sm in parts:
+        for f in sorted(sm.rglob("*.smali")):
+            lines = rd(f).split("\n")
+            sup = super_of(lines)
+            if "Plugin" in sup:
+                found = True
+                print("  " + f.name + " extends " + sup)
+                for l in lines:
+                    if l.startswith(".method") and "load" in l:
+                        print("      " + l)
+    if not found:
+        print("  (Plugin'den tureyen sinif bulunamadi)")
 
 
 def main():
@@ -179,7 +213,8 @@ def main():
                 hooked = True
                 break
         if not hooked:
-            sys.exit("HATA: Plugin.load(Context) bulunamadi; popup hook'u eklenemedi.")
+            describe_plugins(parts)
+            sys.exit("HATA: Plugin.load() / load(Context) bulunamadi; popup hook'u eklenemedi.")
 
         for d, sm in parts:
             if d in changed:
