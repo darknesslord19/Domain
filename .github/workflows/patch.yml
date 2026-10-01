@@ -27,8 +27,8 @@ jobs:
 
       - name: Hazirlik
         run: |
-          mkdir -p output
-          : > output/patch.log
+          mkdir -p builds logs
+          : > logs/patch.log
 
       - name: smali araçları (Maven)
         run: |
@@ -53,11 +53,11 @@ jobs:
           SRC=$(find helper -maxdepth 1 -name '*.java')
           echo "kaynaklar: $SRC"
           if ! javac --release 8 -cp "$AJ" -d build/classes $SRC > build/javac.log 2>&1; then
-            { echo "HATA: javac"; cat build/javac.log; } | tee -a output/patch.log
+            { echo "HATA: javac"; cat build/javac.log; } | tee -a logs/patch.log
             exit 1
           fi
           if ! "$D8" --min-api 21 --lib "$AJ" --output build $(find build/classes -name '*.class') > build/d8.log 2>&1; then
-            { echo "HATA: d8"; cat build/d8.log; } | tee -a output/patch.log
+            { echo "HATA: d8"; cat build/d8.log; } | tee -a logs/patch.log
             exit 1
           fi
           mv build/classes.dex helper.dex
@@ -69,19 +69,19 @@ jobs:
           ONLY: ${{ github.event.inputs.only }}
         run: |
           set -o pipefail
-          mkdir -p output
+          mkdir -p builds logs
           fail=0
           for f in input/*.cs3; do
             [ -e "$f" ] || continue
             name=$(basename "$f")
             if [ -n "$ONLY" ] && [ "$name" != "$ONLY" ]; then continue; fi
             old=$(jq -r --arg n "$name" '.[$n] // empty' sites.json)
-            echo "== $name | domain: ${old:-yok}" | tee -a output/patch.log
+            echo "== $name | domain: ${old:-yok}" | tee -a logs/patch.log
             if [ -z "$old" ]; then
-              echo "ATLANDI: sites.json icinde kayit yok" | tee -a output/patch.log
+              echo "ATLANDI: sites.json icinde kayit yok" | tee -a logs/patch.log
               continue
             fi
-            if ! python patch_cs3.py "$f" --domain "$old" -o "output/$name" 2>&1 | tee -a output/patch.log; then
+            if ! python patch_cs3.py "$f" --domain "$old" -o "builds/$name" 2>&1 | tee -a logs/patch.log; then
               fail=1
             fi
           done
@@ -92,7 +92,7 @@ jobs:
         run: |
           git config user.name "cs3-bot"
           git config user.email "bot@users.noreply.github.com"
-          git add output
+          git add builds logs
           git commit -m "Patched CS3" || echo "no changes"
           git push
 
