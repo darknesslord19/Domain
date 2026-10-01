@@ -28,7 +28,7 @@ INIT_SIG = PKG + "/Hook;->init(Ljava/lang/Object;Landroid/content/Context;)V"
 INIT0_SIG = PKG + "/Hook;->init(Ljava/lang/Object;)V"
 API = "33"
 
-CONST_RE = re.compile(r'^(\s*)const-string(?:/jumbo)?\s+([vp]\d+),\s+"(https?://[^"]*)"\s*$')
+CONST_RE = re.compile(r'^(\s*)(const-string(?:/jumbo)?)\s+([vp]\d+),\s+"(https?://[^"]*)"\s*$')
 SUPER_RE = re.compile(r'^\.super\s+(\S+)')
 LOAD_CTX_RE = re.compile(r'^\.method\s.*\bload\(Landroid/content/Context;\)V\s*$')
 LOAD_NOARG_RE = re.compile(r'^\.method\s.*\bload\(\)V\s*$')
@@ -67,7 +67,7 @@ def candidates(sm_dirs):
             for line in rd(f).split("\n"):
                 m = CONST_RE.match(line)
                 if m:
-                    seen[m.group(3)].add(f.name)
+                    seen[m.group(4)].add(f.name)
     return seen
 
 
@@ -79,20 +79,23 @@ def print_candidates(seen):
         print("  " + url + "   <- " + ", ".join(sorted(seen[url]))[:80])
 
 
-def patch_domain(sm, domain):
+def patch_domain(sm, domain, name):
     want = norm(domain)
     count = 0
     for f in sm.rglob("*.smali"):
         out, hit = [], False
         for line in rd(f).split("\n"):
-            out.append(line)
             m = CONST_RE.match(line)
-            if m and norm(m.group(3)) == want:
-                ind, reg = m.group(1), m.group(2)
+            if m and norm(m.group(4)) == want:
+                ind, op, reg, url = m.group(1), m.group(2), m.group(3), m.group(4)
+                # eski domain'e eklenti adini ekle: "url@@Ad"
+                out.append(ind + op + " " + reg + ', "' + url + "@@" + name + '"')
                 out.append(ind + "invoke-static/range {" + reg + " .. " + reg + "}, " + READ_SIG)
                 out.append(ind + "move-result-object " + reg)
                 hit = True
                 count += 1
+            else:
+                out.append(line)
         if hit:
             wr(f, "\n".join(out))
     return count
@@ -163,6 +166,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("cs3")
     ap.add_argument("--domain", help="CS3 icinde yazili ESKI domain")
+    ap.add_argument("--name", help="Eklenti adi (varsayilan: dosya adi)")
     ap.add_argument("--list", action="store_true", help="bulunan URL'leri listele")
     ap.add_argument("--helper", default="helper.dex")
     ap.add_argument("--tools", default="tools")
@@ -194,9 +198,10 @@ def main():
         if not a.domain:
             sys.exit("HATA: --domain gerekli (once --list ile bak)")
 
+        name = re.sub(r"[^\w.-]", "", a.name or Path(a.cs3).stem) or "plugin"
         total, changed = 0, set()
         for d, sm in parts:
-            n = patch_domain(sm, a.domain)
+            n = patch_domain(sm, a.domain, name)
             if n:
                 total += n
                 changed.add(d)
@@ -231,7 +236,7 @@ def main():
             for p in sorted(x.rglob("*")):
                 if p.is_file():
                     z.write(p, p.relative_to(x).as_posix())
-        print("TAMAM: %d domain yerlestirildi, popup hook eklendi -> %s" % (total, out))
+        print("TAMAM: %d domain yerlestirildi (ad: %s), popup hook eklendi -> %s" % (total, name, out))
 
 
 if __name__ == "__main__":
