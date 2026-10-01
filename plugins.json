@@ -1,0 +1,22 @@
+[
+  {
+    "url": "https://raw.githubusercontent.com/darknesslord19/domain/main/output/HDFilmCehennemi.cs3",
+    "status": 1,
+    "version": 1,
+    "apiVersion": 1,
+    "name": "HDFilmCehennemi",
+    "internalName": "HDFilmCehennemi",
+    "authors": [
+      "darknesslord19"
+    ],
+    "description": "",
+    "repositoryUrl": "https://github.com/darknesslord19/domain",
+    "language": "tr",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "iconUrl": null,
+    "fileSize": 45734
+  }
+]
