@@ -14,6 +14,9 @@ public class DomainStore {
     static final String TOKEN = "";
     static String cur = "";
     static String curName = "";
+    static String lastEff = "";
+    static String lastSrc = "";
+    static String toasted = "";
 
     static Context ctx() {
         if (app != null) return app;
@@ -61,14 +64,15 @@ public class DomainStore {
     public static String def() { return cur; }
 
     static String eff(String def, String name) {
+        lastSrc = "varsayilan";
         try {
             SharedPreferences p = sp();
-            if (p == null) return def;
+            if (p == null) { lastSrc = "varsayilan, ayar dosyasi yok"; return def; }
             String m = p.getString("m:" + id(def, name), "");
-            if (m.length() > 0) return same(def, m);
+            if (m.length() > 0) { lastSrc = "manuel"; return same(def, m); }
             if (p.getBoolean("auto", true)) {
                 String r = lookup(p.getString("remote", ""), def, name);
-                if (r != null) return same(def, r);
+                if (r != null) { lastSrc = "domains.json"; return same(def, r); }
             }
         } catch (Throwable t) { }
         return def;
@@ -85,10 +89,42 @@ public class DomainStore {
         }
         cur = def;
         curName = name;
-        return eff(def, name);
+        String res = eff(def, name);
+        lastEff = res;
+        String key = id(def, name);
+        if (Hook.DEBUG && toasted.indexOf("|" + key + "|") < 0) {
+            toasted += "|" + key + "|";
+            Hook.toast(key + ": " + res + " (" + lastSrc + ")");
+        }
+        return res;
     }
 
     public static String current() { return eff(cur, curName); }
+
+    // Yuklu saglayicilarin mainUrl degerini canli guncelle (en iyi caba, hata olursa sessiz)
+    public static void applyLive() {
+        try {
+            if (cur.length() == 0) return;
+            String now = current();
+            Object holder = Class.forName("com.lagradost.cloudstream3.APIHolder").getField("INSTANCE").get(null);
+            Object lst = holder.getClass().getMethod("getAllProviders").invoke(holder);
+            java.util.ArrayList<Object> copy = new java.util.ArrayList<Object>((java.util.Collection<?>) lst);
+            int n = 0;
+            for (Object api : copy) {
+                try {
+                    String mu = (String) api.getClass().getMethod("getMainUrl").invoke(api);
+                    if (mu == null) continue;
+                    String k = norm(mu);
+                    if (k.equals(norm(cur)) || k.equals(norm(lastEff))) {
+                        api.getClass().getMethod("setMainUrl", String.class).invoke(api, same(mu, now));
+                        n++;
+                    }
+                } catch (Throwable t) { }
+            }
+            lastEff = now;
+            if (n > 0) Hook.toast("Canli guncellendi: " + now);
+        } catch (Throwable t) { }
+    }
 
     // domains.json: once eklenti adi, yoksa eski domain anahtari
     static String lookup(String json, String def, String name) {
@@ -144,14 +180,16 @@ public class DomainStore {
     }
 
     // null = basarili, aksi halde hata metni
-    public static String fetchRemote() {
+    public static String fetchRemote() { return fetchRemote(8000); }
+
+    public static String fetchRemote(int ms) {
         if (RAW.length() == 0) return "domains.json linki tanimli degil";
         try {
             String u = RAW + (RAW.indexOf('?') >= 0 ? "&" : "?") + "t=" + System.currentTimeMillis();
             HttpURLConnection c = (HttpURLConnection) new URL(u).openConnection();
             if (TOKEN.length() > 0) c.setRequestProperty("Authorization", "token " + TOKEN);
-            c.setConnectTimeout(8000);
-            c.setReadTimeout(8000);
+            c.setConnectTimeout(ms);
+            c.setReadTimeout(ms);
             Scanner s = new Scanner(c.getInputStream(), "UTF-8").useDelimiter("\\A");
             String body = s.hasNext() ? s.next() : "";
             s.close();
