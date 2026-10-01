@@ -2,7 +2,7 @@
   {
     "url": "https://raw.githubusercontent.com/darknesslord19/domain/main/builds/HDFilmCehennemi.cs3",
     "status": 1,
-    "version": 2,
+    "version": 3,
     "apiVersion": 1,
     "name": "HDFilmCehennemi",
     "internalName": "HDFilmCehennemi",
@@ -17,6 +17,6 @@
       "TvSeries"
     ],
     "iconUrl": null,
-    "fileSize": 45480
+    "fileSize": 45504
   }
 ]
