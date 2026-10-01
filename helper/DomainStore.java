@@ -80,6 +80,13 @@ public class DomainStore {
         return null;
     }
 
+    // domains.json'daki kayit (yoksa null)
+    public static String remoteFor(String def) {
+        SharedPreferences p = sp();
+        if (p == null) return null;
+        return lookup(p.getString("remote", ""), def);
+    }
+
     public static boolean hasManual() {
         SharedPreferences p = sp();
         return p != null && p.getString("m:" + norm(cur), "").length() > 0;
