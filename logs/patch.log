@@ -1,2 +1,3 @@
 == HDFilmCehennemi.cs3 | domain: https://www.hdfilmcehennemi.nl
+Ust sinif BasePlugin -> Plugin olarak degistirildi: HDFilmCehennemiPlugin.smali
 TAMAM: 2 domain yerlestirildi (ad: HDFilmCehennemi), popup hook eklendi -> builds/HDFilmCehennemi.cs3
