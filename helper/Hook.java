@@ -69,7 +69,7 @@ public class Hook {
             for (Class<?> c = plugin.getClass(); c != null && field == null; c = c.getSuperclass()) {
                 try { field = c.getDeclaredField("openSettings"); } catch (NoSuchFieldException e) { }
             }
-            if (field == null) { toast("Domain hook: openSettings bulunamadi"); return; }
+            if (field == null) { toast("Domain hook: openSettings bulunamadi, ust sinif: " + String.valueOf(plugin.getClass().getSuperclass())); return; }
             field.setAccessible(true);
             fn = field.getType();
         }
