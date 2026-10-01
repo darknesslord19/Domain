@@ -25,6 +25,11 @@ jobs:
       - uses: actions/setup-python@v5
         with: { python-version: "3.12" }
 
+      - name: Hazirlik
+        run: |
+          mkdir -p output
+          : > output/patch.log
+
       - name: smali araçları (Maven)
         run: |
           mkdir -p tools/lib
@@ -44,8 +49,17 @@ jobs:
           AJ=$(ls -d $SDK/platforms/android-*/android.jar | sort -V | tail -1)
           D8=$(ls -d $SDK/build-tools/*/d8 | sort -V | tail -1)
           mkdir -p build/classes
-          javac --release 8 -cp "$AJ" -d build/classes $(find helper -name '*.java')
-          "$D8" --min-api 21 --lib "$AJ" --output build $(find build/classes -name '*.class')
+          # sadece helper/ altindaki dosyalar (eski helper/src kalintilari yok sayilir)
+          SRC=$(find helper -maxdepth 1 -name '*.java')
+          echo "kaynaklar: $SRC"
+          if ! javac --release 8 -cp "$AJ" -d build/classes $SRC > build/javac.log 2>&1; then
+            { echo "HATA: javac"; cat build/javac.log; } | tee -a output/patch.log
+            exit 1
+          fi
+          if ! "$D8" --min-api 21 --lib "$AJ" --output build $(find build/classes -name '*.class') > build/d8.log 2>&1; then
+            { echo "HATA: d8"; cat build/d8.log; } | tee -a output/patch.log
+            exit 1
+          fi
           mv build/classes.dex helper.dex
 
       # sites.json: {"Provider.cs3": "https://eski-domain.com"}
@@ -54,8 +68,8 @@ jobs:
         env:
           ONLY: ${{ github.event.inputs.only }}
         run: |
+          set -o pipefail
           mkdir -p output
-          : > output/patch.log
           fail=0
           for f in input/*.cs3; do
             [ -e "$f" ] || continue
