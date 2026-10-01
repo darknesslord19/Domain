@@ -1,0 +1,8 @@
+{
+  "name": "domain",
+  "description": "",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/darknesslord19/domain/main/plugins.json"
+  ]
+}
