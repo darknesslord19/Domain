@@ -140,7 +140,14 @@ def patch_hook(sm):
         for method_re, call in variants:
             out, done = insert_hook(lines, method_re, call)
             if done:
-                wr(f, "\n".join(out))
+                new_text = "\n".join(out)
+                if sup.endswith("/BasePlugin;"):
+                    # ayar butonu (openSettings) sadece Plugin'de var: ust sinifi Plugin yap
+                    plug = sup[:-len("BasePlugin;")] + "Plugin;"
+                    new_text = new_text.replace(".super " + sup, ".super " + plug, 1)
+                    new_text = new_text.replace(sup + "-><init>()V", plug + "-><init>()V")
+                    print("Ust sinif BasePlugin -> Plugin olarak degistirildi: " + f.name)
+                wr(f, new_text)
                 return True
     return False
 
