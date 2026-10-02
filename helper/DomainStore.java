@@ -12,6 +12,7 @@ public class DomainStore {
     public static Context app;
     static final String RAW = "https://raw.githubusercontent.com/darknesslord19/domain/main/domains.json";
     static final String TOKEN = "";
+    static final String ABOUT = "https://raw.githubusercontent.com/darknesslord19/domain/main/about.json";
     static String cur = "";
     static String curName = "";
     static String lastEff = "";
@@ -177,6 +178,20 @@ public class DomainStore {
     public static void setAuto(boolean b) {
         SharedPreferences p = sp();
         if (p != null) p.edit().putBoolean("auto", b).apply();
+    }
+
+    // Verilen adresten metin oku (about.json / about.txt)
+    public static String fetchText(String url, int ms) throws Exception {
+        String u = url + (url.indexOf('?') >= 0 ? "&" : "?") + "t=" + System.currentTimeMillis();
+        HttpURLConnection c = (HttpURLConnection) new URL(u).openConnection();
+        if (TOKEN.length() > 0) c.setRequestProperty("Authorization", "token " + TOKEN);
+        c.setConnectTimeout(ms);
+        c.setReadTimeout(ms);
+        Scanner s = new Scanner(c.getInputStream(), "UTF-8").useDelimiter("\\A");
+        String body = s.hasNext() ? s.next() : "";
+        s.close();
+        if (body.length() > 20000) body = body.substring(0, 20000);
+        return body;
     }
 
     // null = basarili, aksi halde hata metni
