@@ -20,6 +20,26 @@
     "fileSize": 46998
   },
   {
+    "url": "https://raw.githubusercontent.com/darknesslord19/domain/main/builds/Dizilla.cs3",
+    "status": 1,
+    "version": 92,
+    "apiVersion": 1,
+    "name": "Dizilla",
+    "internalName": "Dizilla",
+    "authors": [
+      "darknesslord19"
+    ],
+    "description": "",
+    "repositoryUrl": "https://github.com/darknesslord19/domain",
+    "language": "tr",
+    "tvTypes": [
+      "Movie",
+      "TvSeries"
+    ],
+    "iconUrl": null,
+    "fileSize": 68539
+  },
+  {
     "url": "https://raw.githubusercontent.com/darknesslord19/domain/main/builds/HDFilmCehennemi.cs3",
     "status": 1,
     "version": 4,
