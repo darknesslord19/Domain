@@ -1,3 +1,25 @@
 CloudStream Hakkında
 
 CloudStream, açık kaynaklı bir medya akış uygulamasıdır. Android cihazlarda film, dizi, anime ve canlı TV içeriklerini tek bir platformda toplamayı amaçlar.
+
+Ne İşe Yarar?
+
+CloudStream, farklı kaynakları tek çatı altında birleştirir. Kendi içeriğini barındırmaz; bunun yerine "eklenti" (plugin) sistemiyle çalışır. Kullanıcılar istedikleri kaynakları ekleyerek kişiselleştirilmiş bir izleme deneyimi oluşturabilir.
+
+Öne Çıkan Özellikler
+
+· Açık Kaynak: Tamamen ücretsiz, reklamsız ve topluluk tarafından geliştirilir.
+· Eklenti Desteği: Farklı içerik sağlayıcıları için geniş bir eklenti ekosistemi.
+· Çoklu Dil: Topluluk çevirileriyle birçok dilde kullanılabilir.
+· Özelleştirilebilir Arayüz: Tema ve kullanım tercihleri kullanıcıya bırakılmıştır.
+· Chromecast & Altyazı: Harici oynatıcı ve altyazı desteği sunar.
+
+Nasıl Çalışır?
+
+1. CloudStream'i cihazınıza kurarsınız.
+2. Depo (repository) ekleyerek eklentilere erişirsiniz.
+3. İstediğiniz eklentileri yükleyip içerikleri görüntülemeye başlarsınız.
+
+Yasal Uyarı
+
+CloudStream yalnızca bir medya oynatıcı arayüzüdür. Uygulama herhangi bir içerik barındırmaz veya dağıtmaz. Kullanıcıların eklediği üçüncü taraf eklentiler ve bunların içerikleri tamamen kullanıcının sorumluluğundadır. Telif hakkıyla korunan içerikleri izlemek bulunduğunuz ülkenin yasalarına aykırı olabilir.
